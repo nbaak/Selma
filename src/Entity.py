@@ -1,4 +1,4 @@
-
+from math import sin
 import pygame
 
 class Entity(pygame.sprite.Sprite):
@@ -42,3 +42,10 @@ class Entity(pygame.sprite.Sprite):
         self.collision("vertical")
         
         self.rect.center = self.hitbox.center
+
+    def wave_value(self):
+        value = sin(pygame.time.get_ticks())
+        if value > 0:
+            return 255
+        else:
+            return 0

@@ -54,8 +54,15 @@ class Player(Entity):
         self.exp = 0
         self.exp_percent = 0
         self.speed = self.stats["speed"]
+        
         # obstacles
         self.obstacle_sprites = obstacle_sprites
+        
+        # vulnerability
+        self.vulnerable = True
+        self.hurt_time = None
+        self.invulnerability_duration = 500
+        
         
     def import_player_assets(self):
         character_path = "../images/player"
@@ -163,6 +170,10 @@ class Player(Entity):
             if 'attack' in self.status:
                 self.status = self.status.replace('_attack','')
 
+    def get_full_weapon_damage(self):
+        print(self.stats["attack"] + weapon_data[self.weapon]["damage"])
+        return self.stats["attack"] + weapon_data[self.weapon]["damage"]
+
     def gain_exp(self, amount = 0):
         self.exp += amount
         self.exp_percent = self.exp
@@ -173,7 +184,7 @@ class Player(Entity):
     def cooldowns(self):
         current_time = pygame.time.get_ticks()
         if self.attacking:
-            if current_time - self.attacking_time >= self.attacking_cooldown:
+            if current_time - self.attacking_time >= self.attacking_cooldown + weapon_data[self.weapon]["cooldown"]:
                 self.attacking = False
                 self.destroy_attack()
                 
@@ -184,6 +195,10 @@ class Player(Entity):
         if not self.magic_switchable:
             if current_time - self.magic_switch_time >= self.magic_switch_cooldown:
                 self.magic_switchable = True
+                
+        if not self.vulnerable:
+            if current_time - self.hurt_time >= self.invulnerability_duration:
+                self.vulnerable = True
 
     def animate(self):
         animation = self.animations[self.status]
@@ -193,7 +208,14 @@ class Player(Entity):
             self.frame_index = 0
             
         self.image = animation[int(self.frame_index)]
-        self.rect = self.image.get_rect(center=self.hitbox.center) 
+        self.rect = self.image.get_rect(center=self.hitbox.center)
+        
+        # flicker
+        if not self.vulnerable:
+            alpha = self.wave_value()
+            self.image.set_alpha(alpha)
+        else:
+            self.image.set_alpha(255)
 
     def update(self):
         self.read_keyboard_input()
