@@ -8,10 +8,13 @@ from Monster import Monster
 from Weapon import Weapon
 from CameraGroup import YSortCameraGroup
 from UI import UI
+from Magic import MagicPlayer
 
 from lib import load
 from lib.MapLayout import MapLayout
 from lib.Monsters import Monsters
+from Particles import AnimationPlayer
+from _socket import SO_PASSSEC
 
 class Level:
     
@@ -34,6 +37,10 @@ class Level:
         
         # User Interface
         self.ui = UI()
+        
+        # particles
+        self.animation_player = AnimationPlayer()
+        self.magic_player = MagicPlayer(self.animation_player)
          
     def create_map(self):
         layouts = {
@@ -71,12 +78,18 @@ class Level:
                                     [self.visible_sprites], 
                                     self.obstacle_sprites, 
                                     self.create_attack, 
-                                    self.destroy_attack, 
+                                    self.destroy_attack,
                                     self.create_magic
                                 )
                             else:
                                 monster = Monsters(col).name
-                                Monster(monster, pos, [self.visible_sprites, self.attackable_sprites], self.obstacle_sprites, self.damage_player)
+                                Monster(monster, 
+                                        pos, 
+                                        [self.visible_sprites, self.attackable_sprites], 
+                                        self.obstacle_sprites, 
+                                        self.damage_player, 
+                                        self.trigger_death_particles
+                                        )
                             
                     else:
                         pass
@@ -91,9 +104,16 @@ class Level:
             self.current_attack.kill()
         self.current_attack = None
     
-    def create_magic(self, style, strength, cost):
-        self.current_magic = None
+    def create_magic(self, style: str, strength, cost):
         print(f"style: {style}, strength: {strength}, cost: {cost}")
+        
+        if style =='heal':
+            self.magic_player.heal(self.player, strength, cost, [self.visible_sprites]) 
+        
+        elif style == 'flame':
+            self.magic_player.flame(self.player, cost, [self.visible_sprites, self.attack_sprites])
+        
+        self.current_magic = None
         
     def destroy_magic(self):
         pass
@@ -106,6 +126,10 @@ class Level:
                 if collision_sprites:
                     for target in collision_sprites:
                         if target.sprite_type == MapLayout.GRASS:
+                            pos = target.rect.center
+                            offset = pygame.math.Vector2(0,75)
+                            for _ in range(random.randint(3,6)):
+                                self.animation_player.create_grass_particles(pos-offset, [self.visible_sprites])
                             target.kill()
                         else:
                             # attack the enemy
@@ -117,9 +141,11 @@ class Level:
             self.player.vulnerable = False
             self.player.hurt_time = pygame.time.get_ticks()
             
-            # todo: spawn particles
+            self.animation_player.create_particles(attack_type, self.player.rect.center, [self.visible_sprites])
 
- 
+    def trigger_death_particles(self, pos, animation_type):
+        self.animation_player.create_particles(animation_type, pos, [self.visible_sprites])
+
     def update(self):
         # update things
         self.visible_sprites.custom_draw(self.player)

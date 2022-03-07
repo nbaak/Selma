@@ -152,6 +152,22 @@ class Player(Entity):
                 self.magic = list(magic_data.keys())[self.magic_index]
                 self.magic_switchable = False
     
+    def get_direction(self):
+        return self.status.split("_")[0]
+    
+    def get_direction_vector(self) -> pygame.math.Vector2:
+        
+        if self.get_direction() == 'right':
+            return pygame.math.Vector2(1,0)
+        elif self.get_direction() == 'left':
+            return pygame.math.Vector2(-1,0)
+        elif self.get_direction() == 'up':
+            return pygame.math.Vector2(0,-1)
+        elif self.get_direction() == 'down':
+            return pygame.math.Vector2(0,1)
+        else:
+            return pygame.math.Vector2(0,0)
+        
     def get_state(self):
         # idle
         if self.direction.x == 0 and self.direction.y == 0:
@@ -171,8 +187,11 @@ class Player(Entity):
                 self.status = self.status.replace('_attack','')
 
     def get_full_weapon_damage(self):
-        print(self.stats["attack"] + weapon_data[self.weapon]["damage"])
         return self.stats["attack"] + weapon_data[self.weapon]["damage"]
+    
+    
+    def get_full_magic_damage(self):        
+        return self.stats["magic"] + magic_data[self.magic]["strength"]
 
     def gain_exp(self, amount = 0):
         self.exp += amount
@@ -216,6 +235,14 @@ class Player(Entity):
             self.image.set_alpha(alpha)
         else:
             self.image.set_alpha(255)
+            
+    def recovery(self):
+        if self.energy < self.stats["energy"]:
+            self.energy += .01 * self.stats["magic"]
+        
+        else:
+            self.energy = self.stats["energy"]
+        
 
     def update(self):
         self.read_keyboard_input()
@@ -223,6 +250,8 @@ class Player(Entity):
         self.get_state()
         self.animate()
         self.move()
+        
+        self.recovery()
         #self.gain_exp(1)
         
         #print(f"status: {self.status}")
