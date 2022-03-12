@@ -7,7 +7,7 @@ from Player import Player
 
 class Monster(Entity):
     
-    def __init__(self, monster_name, pos, groups, obstacle_sprites, damage_player, trigger_death_particles):
+    def __init__(self, monster_name, pos, groups, obstacle_sprites, damage_player, trigger_death_particles, add_player_exp):
         super().__init__(groups)
         
         self.sprite_type = "enemy"
@@ -39,6 +39,7 @@ class Monster(Entity):
         self.attack_time = None
         self.attack_cooldown = 500
         self.damage_player = damage_player
+        self.add_player_exp = add_player_exp
         self.trigger_death_particles = trigger_death_particles
         
         # vulnerability timer
@@ -101,6 +102,7 @@ class Monster(Entity):
     def check_death(self):
         if self.health <= 0:
             self.trigger_death_particles(self.rect.center, self.monster_name)
+            self.add_player_exp(self.exp)
             self.kill()
             
     def actions(self, player: Player):
@@ -146,7 +148,7 @@ class Monster(Entity):
         
     def update(self):
         self.hit_reaction()
-        self.move()
+        self.move(self.speed)
         self.animate()
         self.cooldowns()
         self.check_death()

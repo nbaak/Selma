@@ -1,6 +1,6 @@
 
 import pygame
-
+import Player
 from settings import *
 
 class UI():
@@ -40,12 +40,13 @@ class UI():
         pygame.draw.rect(self.surface, color, new_rect)
     
     def show_exp(self, exp):
+        # maybe redo... don't know yet
         text = self.font.render(str(int(exp)), False, TEXT_COLOR)
         x = pygame.display.get_window_size()[0] -10  
         y = pygame.display.get_window_size()[1] -10
         text_rect = text.get_rect(bottomright=(x,y))        
         
-        # self.show_bar(exp, 1000, text_rect, "gold")
+        self.show_bar(exp, 1000, text_rect, "gold")
         self.surface.blit(text, text_rect)
         
     def selection_box(self, left, top, switched=False):
@@ -67,10 +68,11 @@ class UI():
         
         self.surface.blit(surface, rect)
      
-    def display(self, player):
+    def display(self, player:Player):
         self.show_bar(player.health, player.stats["health"], self.health_bar_rect, HEALTH_BAR_COLOR)
         self.show_bar(player.energy, player.stats["energy"], self.energy_bar_rect, ENERGY_BAR_COLOR)
-        self.show_bar(player.exp_percent, 100, self.exp_bar_rect, EXP_BAR_COLOR)
+        #self.show_bar(player.exp_percent, 100, self.exp_bar_rect, EXP_BAR_COLOR)
+        self.show_exp(player.exp)
         
         self.item_overlay(player.weapon_switchable, self.weapon_graphics, player.weapon_index, 0)
         self.item_overlay(player.magic_switchable, self.magic_graphics, player.magic_index, 1)

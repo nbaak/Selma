@@ -29,6 +29,13 @@ ENERGY_BAR_COLOR = "blue"
 EXP_BAR_COLOR = "gold"
 UI_BORDER_COLOR_ACTIVE = "gold"
 
+# Upgrade Menu
+TEXT_COLOR_SELECTED = '#111111'
+BAR_COLOR = '#eeeeee'
+BAR_COLOR_SELECTED = "#111111"
+UPGRADE_BG_COLOR_SELECTED = "#eeeeee"
+
+
 
 WEAPONS_FOLDER = "../images/weapons"
 weapon_data = {

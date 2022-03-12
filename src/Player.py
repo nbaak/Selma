@@ -41,7 +41,7 @@ class Player(Entity):
         self.magic_switch_time = None
         self.magic_switch_cooldown = 200
         
-        # stats
+        # bsae stats
         self.stats = {
             "health": 100,
             "energy": 100,
@@ -49,9 +49,28 @@ class Player(Entity):
             "magic": 4,
             "speed": 5,
         }
+        
+        # max stats
+        self.max_stats = {
+            "health": 300,
+            "energy": 200,
+            "attack": 50,
+            "magic": 20,
+            "speed": 15,
+        }
+        
+        # upgrade costs
+        self.upgrade_cost = {
+            "health": 100,
+            "energy": 100,
+            "attack": 100,
+            "magic": 100,
+            "speed": 100,
+        }
+        
         self.health = self.stats["health"]
         self.energy = self.stats["energy"]
-        self.exp = 0
+        self.exp = 5000
         self.exp_percent = 0
         self.speed = self.stats["speed"]
         
@@ -192,13 +211,23 @@ class Player(Entity):
     
     def get_full_magic_damage(self):        
         return self.stats["magic"] + magic_data[self.magic]["strength"]
+    
+    def get_stats_label_by_index(self, index:int):
+        return list(self.stats.keys())[index]
+    
+    def get_value_by_index(self, index:int):
+        return list(self.stats.values())[index]
+    
+    def get_cost_by_index(self, index:int):
+        return list(self.upgrade_cost.values())[index]
 
     def gain_exp(self, amount = 0):
         self.exp += amount
-        self.exp_percent = self.exp
-        
-        if self.exp > 100:
-            self.exp = 0
+               
+        # normalize
+        self.exp_percent = self.exp // 100        
+            
+        print("EXP:",self.exp)
 
     def cooldowns(self):
         current_time = pygame.time.get_ticks()
@@ -249,7 +278,7 @@ class Player(Entity):
         self.cooldowns()
         self.get_state()
         self.animate()
-        self.move()
+        self.move(self.stats["speed"])
         
         self.recovery()
         #self.gain_exp(1)

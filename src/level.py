@@ -14,13 +14,14 @@ from lib import load
 from lib.MapLayout import MapLayout
 from lib.Monsters import Monsters
 from Particles import AnimationPlayer
-from _socket import SO_PASSSEC
+from Upgrade import Upgrade
 
 class Level:
     
     def __init__(self):
         
         self.surface = pygame.display.get_surface()
+        self.game_paused = False
         
         # visual sprites
         self.visible_sprites = YSortCameraGroup()
@@ -33,10 +34,12 @@ class Level:
         self.attackable_sprites = pygame.sprite.Group()
         
         # setup sprites
+        # also defines player and monsters
         self.create_map()
         
         # User Interface
         self.ui = UI()
+        self.upgrade_menu = Upgrade(self.player)
         
         # particles
         self.animation_player = AnimationPlayer()
@@ -88,7 +91,8 @@ class Level:
                                         [self.visible_sprites, self.attackable_sprites], 
                                         self.obstacle_sprites, 
                                         self.damage_player, 
-                                        self.trigger_death_particles
+                                        self.trigger_death_particles,
+                                        self.add_player_exp
                                         )
                             
                     else:
@@ -143,18 +147,33 @@ class Level:
             
             self.animation_player.create_particles(attack_type, self.player.rect.center, [self.visible_sprites])
 
+    def add_player_exp(self, amount):
+        self.player.gain_exp(amount)
+
     def trigger_death_particles(self, pos, animation_type):
         self.animation_player.create_particles(animation_type, pos, [self.visible_sprites])
+        
+    def toggle_menu(self):
+        self.game_paused = not self.game_paused
 
     def update(self):
         # update things
         self.visible_sprites.custom_draw(self.player)
-        self.visible_sprites.update()
-        self.visible_sprites.monster_update(self.player)
-        
-        self.player_attack_logic()
-        
         self.ui.display(self.player)
+        
+        if self.game_paused:
+            # show upgraade menu
+            self.upgrade_menu.display()
+            
+        else:
+            # run the game
+            self.visible_sprites.update()
+            self.visible_sprites.monster_update(self.player)
+            self.player_attack_logic()
+
+        
+        
+        
         
         
         

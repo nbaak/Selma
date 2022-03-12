@@ -31,14 +31,14 @@ class Entity(pygame.sprite.Sprite):
                     if self.direction.y > 0: # moving down
                         self.hitbox.bottom = sprite.hitbox.top
             
-    def move(self):
+    def move(self, speed=.1):
         if self.direction.magnitude() != 0:
             self.direction = self.direction.normalize()
             
-        self.hitbox.x += self.direction.x * self.speed
+        self.hitbox.x += self.direction.x * speed
         self.collision("horizontal")
         
-        self.hitbox.y += self.direction.y * self.speed
+        self.hitbox.y += self.direction.y * speed
         self.collision("vertical")
         
         self.rect.center = self.hitbox.center
