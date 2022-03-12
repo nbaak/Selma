@@ -6,6 +6,14 @@ TILESIZE = 64
 
 FPS = 60
 
+
+HITBOX_OFFSET = {
+    "player": -26,
+    "object": -40,
+    "grass": -10,
+    "invisible": 0
+    }
+
 # User Interface
 BAR_HEIGHT = 20
 EXP_BAR_HEIGHT = 5

@@ -10,7 +10,7 @@ class Player(Entity):
         super().__init__(groups)
         self.image = pygame.image.load('../images/test/player.png').convert_alpha()
         self.rect = self.image.get_rect(topleft=pos)
-        self.hitbox = self.rect.inflate(0,-25)
+        self.hitbox = self.rect.inflate(-6,HITBOX_OFFSET["player"])
         
         # import player assets
         self.import_player_assets()
