@@ -10,10 +10,13 @@ class MagicPlayer():
     
     def __init__(self, animation_player:AnimationPlayer):
         self.animation_player = animation_player
-        
+        self.sounds = {
+            "heal":pygame.mixer.Sound("../audio/heal.wav"),
+            "flame":pygame.mixer.Sound("../audio/Fire.wav"),}
         
     def heal(self, player: Player, strength, cost, groups):
         if player.energy >= cost:
+            self.sounds["heal"].play()
             player.health += strength
             player.energy -= cost
             
@@ -25,6 +28,7 @@ class MagicPlayer():
     
     def flame(self, player: Player, cost, groups):
         if player.energy >= cost:
+            self.sounds["flame"].play()
             player.energy -= cost
             
             direction = player.get_direction_vector()
